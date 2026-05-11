@@ -4,6 +4,8 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dd/markitdown)
 [![Built by AutoGen Team](https://img.shields.io/badge/Built%20by-AutoGen%20Team-blue)](https://github.com/microsoft/autogen)
 
+[English](https://github.com/antstars/markitdown/blob/main/README.md) | [中文](https://github.com/antstars/markitdown/blob/main/README.zh-CN.md)
+
 > [!IMPORTANT]
 > MarkItDown performs I/O with the privileges of the current process. Like open() or requests.get(), it will access resources that the process itself can access. Sanitize your inputs in untrusted environments, and call the narrowest `convert_*` function needed for your use case (e.g., `convert_stream()`, or `convert_local()`). See the [Security Considerations](#security-considerations) section of the documentation for more information.
 
@@ -156,7 +158,7 @@ print(result.text_content)
 
 If no `llm_client` is provided the plugin still loads, but OCR is silently skipped and the standard built-in converter is used instead.
 
-See [`packages/markitdown-ocr/README.md`](packages/markitdown-ocr/README.md) for detailed documentation.
+See [`packages/markitdown-ocr/README.md`](https://github.com/antstars/markitdown/blob/main/packages/markitdown-ocr/README.md) for detailed documentation.
 
 ### Azure Document Intelligence
 
