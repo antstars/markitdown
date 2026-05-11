@@ -1,0 +1,24 @@
+services:
+  markitdown-web:
+    build:
+      context: .
+      dockerfile: packages/markitdown-web/Dockerfile
+    image: markitdown-web:latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      MARKITDOWN_WEB_TEMP_DIR: /tmp/markitdown-web
+    volumes:
+      - markitdown-web-data:/tmp/markitdown-web
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+volumes:
+  markitdown-web-data:

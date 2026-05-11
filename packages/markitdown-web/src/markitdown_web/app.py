@@ -49,6 +49,10 @@ def create_app(settings: Settings | None = None, job_store: JobStore | None = No
     def require_post_auth(request: Request) -> None:
         auth.require_csrf(request)
 
+    @app.get("/api/health")
+    async def health() -> dict:
+        return {"ok": True}
+
     @app.get("/api/config")
     async def get_config(_: None = Depends(require_auth)) -> dict:
         return {

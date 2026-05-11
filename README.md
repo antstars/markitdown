@@ -361,19 +361,34 @@ The launcher starts the web server and opens the browser automatically unless `-
 
 ### Docker
 
+CLI conversion image:
+
 ```sh
 docker build -t markitdown:latest .
 docker run --rm -i markitdown:latest < ~/your-file.pdf > output.md
 ```
 
-To build and run the web app Docker image:
+Web app image:
 
 ```bash
 docker build -f packages/markitdown-web/Dockerfile -t markitdown-web:latest .
-docker run --rm -p 3000:3000 -e MARKITDOWN_WEB_PASSWORD=change-me markitdown-web:latest
+docker run --rm -p 3000:3000 \
+  -e MARKITDOWN_WEB_PASSWORD=change-me \
+  -e MARKITDOWN_WEB_SECRET_KEY=replace-with-a-long-random-secret \
+  markitdown-web:latest
 ```
 
 Open `http://127.0.0.1:3000`.
+
+Docker Compose:
+
+```bash
+cp deploy/linux/markitdown-web.env.example .env
+# Edit .env and set MARKITDOWN_WEB_PASSWORD and MARKITDOWN_WEB_SECRET_KEY.
+docker compose up --build
+```
+
+For production service templates, see `deploy/linux/markitdown-web.service` for systemd and `deploy/macos/com.markitdown.web.plist` for macOS launchd. Public deployments should run behind a TLS reverse proxy and must set a strong `MARKITDOWN_WEB_PASSWORD` plus a stable `MARKITDOWN_WEB_SECRET_KEY`.
 
 ## Contributing
 

@@ -199,7 +199,79 @@ From the repository root:
 
 ```bash
 docker build -f packages/markitdown-web/Dockerfile -t markitdown-web:latest .
-docker run --rm -p 3000:3000 -e MARKITDOWN_WEB_PASSWORD=change-me markitdown-web:latest
+docker run --rm -p 3000:3000 \
+  -e MARKITDOWN_WEB_PASSWORD=change-me \
+  -e MARKITDOWN_WEB_SECRET_KEY=replace-with-a-long-random-secret \
+  markitdown-web:latest
 ```
 
 Open `http://127.0.0.1:3000`.
+
+For Docker Compose:
+
+```bash
+cp deploy/linux/markitdown-web.env.example .env
+# Edit .env and set MARKITDOWN_WEB_PASSWORD and MARKITDOWN_WEB_SECRET_KEY.
+docker compose up --build
+```
+
+The Compose service stores temporary job data in a named volume and checks `GET /api/health`.
+
+## Linux systemd
+
+Copy or clone the repository into `/opt/markitdown`, then create a virtual environment:
+
+```bash
+sudo useradd --system --home /opt/markitdown --shell /usr/sbin/nologin markitdown
+sudo mkdir -p /opt/markitdown /var/lib/markitdown-web
+sudo chown -R markitdown:markitdown /opt/markitdown /var/lib/markitdown-web
+
+cd /opt/markitdown
+python3 -m venv .venv
+.venv/bin/pip install -e 'packages/markitdown[all]' -e packages/markitdown-web
+```
+
+Install the environment and service files:
+
+```bash
+sudo cp deploy/linux/markitdown-web.env.example /etc/markitdown-web.env
+sudo editor /etc/markitdown-web.env
+sudo cp deploy/linux/markitdown-web.service /etc/systemd/system/markitdown-web.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now markitdown-web
+```
+
+Check status and logs:
+
+```bash
+systemctl status markitdown-web
+journalctl -u markitdown-web -f
+```
+
+The service binds to `127.0.0.1:3000` by default. Put it behind a TLS reverse proxy before exposing it publicly.
+
+## macOS launchd
+
+From a user-owned repository checkout, install the app, then edit the plist paths and environment values:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -e 'packages/markitdown[all]' -e packages/markitdown-web
+
+cp deploy/macos/com.markitdown.web.plist ~/Library/LaunchAgents/com.markitdown.web.plist
+open -e ~/Library/LaunchAgents/com.markitdown.web.plist
+```
+
+Replace `YOUR_USER`, set `MARKITDOWN_WEB_PASSWORD`, and set a stable `MARKITDOWN_WEB_SECRET_KEY`. Then load it:
+
+```bash
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.markitdown.web.plist
+launchctl enable gui/$(id -u)/com.markitdown.web
+launchctl kickstart -k gui/$(id -u)/com.markitdown.web
+```
+
+Logs are written to `~/Library/Logs/markitdown-web.log` and `~/Library/Logs/markitdown-web.err.log`.
+
+## Production notes
+
+Always set a strong `MARKITDOWN_WEB_PASSWORD` and a stable `MARKITDOWN_WEB_SECRET_KEY` for production. Keep the app bound to localhost when using systemd or launchd, terminate TLS in a reverse proxy, and tune `MARKITDOWN_WEB_MAX_FILE_MB`, `MARKITDOWN_WEB_MAX_BATCH`, `MARKITDOWN_WEB_MAX_WORKERS`, and `MARKITDOWN_WEB_URL_TIMEOUT_SECONDS` for the machine size and threat model.

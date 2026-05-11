@@ -63,6 +63,12 @@ def test_auth_required(client):
     assert response.status_code == 401
 
 
+def test_health_does_not_require_auth(client):
+    response = client.get("/api/health")
+    assert response.status_code == 200
+    assert response.json() == {"ok": True}
+
+
 def test_login_rejects_bad_password(client):
     response = client.post("/api/auth/login", json={"password": "bad"})
     assert response.status_code == 401

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.markitdown.web</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/YOUR_USER/markitdown/.venv/bin/markitdown-web</string>
+    <string>--host</string>
+    <string>127.0.0.1</string>
+    <string>--port</string>
+    <string>3000</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/YOUR_USER/markitdown</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>MARKITDOWN_WEB_PASSWORD</key>
+    <string>change-me</string>
+    <key>MARKITDOWN_WEB_SECRET_KEY</key>
+    <string>replace-with-a-long-random-secret</string>
+    <key>MARKITDOWN_WEB_TEMP_DIR</key>
+    <string>/Users/YOUR_USER/Library/Application Support/markitdown-web</string>
+    <key>MARKITDOWN_WEB_MAX_FILE_MB</key>
+    <string>50</string>
+    <key>MARKITDOWN_WEB_MAX_BATCH</key>
+    <string>20</string>
+    <key>MARKITDOWN_WEB_TTL_MINUTES</key>
+    <string>60</string>
+    <key>MARKITDOWN_WEB_MAX_WORKERS</key>
+    <string>2</string>
+    <key>MARKITDOWN_WEB_URL_TIMEOUT_SECONDS</key>
+    <string>20</string>
+    <key>MARKITDOWN_ENABLE_PLUGINS</key>
+    <string>false</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/markitdown-web.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/markitdown-web.err.log</string>
+</dict>
+</plist>

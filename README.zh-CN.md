@@ -401,10 +401,23 @@ Web 应用镜像：
 
 ```bash
 docker build -f packages/markitdown-web/Dockerfile -t markitdown-web:latest .
-docker run --rm -p 3000:3000 -e MARKITDOWN_WEB_PASSWORD=change-me markitdown-web:latest
+docker run --rm -p 3000:3000 \
+  -e MARKITDOWN_WEB_PASSWORD=change-me \
+  -e MARKITDOWN_WEB_SECRET_KEY=replace-with-a-long-random-secret \
+  markitdown-web:latest
 ```
 
 打开 `http://127.0.0.1:3000`。
+
+Docker Compose：
+
+```bash
+cp deploy/linux/markitdown-web.env.example .env
+# 编辑 .env，设置 MARKITDOWN_WEB_PASSWORD 和 MARKITDOWN_WEB_SECRET_KEY。
+docker compose up --build
+```
+
+生产服务模板见 `deploy/linux/markitdown-web.service`（systemd）和 `deploy/macos/com.markitdown.web.plist`（macOS launchd）。公开部署时建议放在 TLS 反向代理后面，并必须设置强 `MARKITDOWN_WEB_PASSWORD` 和稳定的 `MARKITDOWN_WEB_SECRET_KEY`。
 
 ## 贡献
 

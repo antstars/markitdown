@@ -14,6 +14,7 @@ ENV FFMPEG_PATH=/usr/bin/ffmpeg
 ENV MARKITDOWN_WEB_TEMP_DIR=/tmp/markitdown-web
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     exiftool \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
@@ -28,6 +29,9 @@ RUN pip --no-cache-dir install \
 
 USER nobody:nogroup
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:3000/api/health || exit 1
 
 ENTRYPOINT ["markitdown-web"]
 CMD ["--host", "0.0.0.0", "--port", "3000"]
