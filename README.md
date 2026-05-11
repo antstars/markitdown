@@ -202,12 +202,176 @@ result = md.convert("example.jpg")
 print(result.text_content)
 ```
 
+### Web App
+
+This repository also includes `markitdown-web`, a FastAPI + React web application for converting uploaded files and HTTP(S) URLs to Markdown in the browser.
+
+Features include:
+
+- Drag-and-drop file uploads
+- Batch URL conversion
+- Per-item conversion status and error reporting
+- Markdown preview, copy, single-file download, and batch ZIP download
+- Password-protected access with signed cookies and CSRF protection
+- Temporary job storage with automatic expiry
+- Upload size, batch size, URL timeout, and SSRF protections for public deployments
+- Optional plugin, LLM, OCR, and Azure Document Intelligence support through environment variables
+
+To run it from source:
+
+```bash
+pip install -e 'packages/markitdown[all]'
+pip install -e 'packages/markitdown-web'
+
+export MARKITDOWN_WEB_PASSWORD='change-me'
+markitdown-web --host 127.0.0.1 --port 3000
+```
+
+On Windows PowerShell:
+
+```powershell
+pip install -e 'packages/markitdown[all]'
+pip install -e 'packages/markitdown-web'
+
+$env:MARKITDOWN_WEB_PASSWORD = 'change-me'
+markitdown-web --host 127.0.0.1 --port 3000
+```
+
+Then open `http://127.0.0.1:3000`.
+
+For frontend development:
+
+```bash
+cd packages/markitdown-web/frontend
+npm install
+npm run dev
+```
+
+For production frontend assets:
+
+```bash
+cd packages/markitdown-web/frontend
+npm ci
+npm run build
+```
+
+The production build writes static files into `packages/markitdown-web/src/markitdown_web/static`.
+
+### Building Desktop Executables
+
+`markitdown-web` can be packaged as a self-contained executable with PyInstaller. PyInstaller builds are platform-specific, so build Windows `.exe` files on Windows, Linux binaries on Linux, and macOS binaries on macOS. Python 3.10-3.13 is recommended for full optional dependency support.
+
+Install Python and Node dependencies first:
+
+```bash
+pip install -U pyinstaller
+pip install -e 'packages/markitdown[all]'
+pip install -e 'packages/markitdown-web'
+
+cd packages/markitdown-web/frontend
+npm ci
+npm run build
+cd ../../..
+```
+
+Windows PowerShell:
+
+```powershell
+python -m PyInstaller --noconfirm --clean --name MarkItDownWeb --onefile --console `
+  --paths packages/markitdown-web/src `
+  --paths packages/markitdown/src `
+  --collect-all markitdown `
+  --collect-all magika `
+  --collect-all pdfplumber `
+  --collect-all pypdfium2 `
+  --collect-all openpyxl `
+  --collect-all pptx `
+  --collect-all mammoth `
+  --add-data "packages/markitdown-web/src/markitdown_web/static;markitdown_web/static" `
+  packages/markitdown-web/scripts/markitdown_web_launcher.py
+```
+
+The executable is written to:
+
+```text
+dist/MarkItDownWeb.exe
+```
+
+Linux:
+
+```bash
+python -m PyInstaller --noconfirm --clean --name MarkItDownWeb --onefile --console \
+  --paths packages/markitdown-web/src \
+  --paths packages/markitdown/src \
+  --collect-all markitdown \
+  --collect-all magika \
+  --collect-all pdfplumber \
+  --collect-all pypdfium2 \
+  --collect-all openpyxl \
+  --collect-all pptx \
+  --collect-all mammoth \
+  --add-data "packages/markitdown-web/src/markitdown_web/static:markitdown_web/static" \
+  packages/markitdown-web/scripts/markitdown_web_launcher.py
+```
+
+The executable is written to:
+
+```text
+dist/MarkItDownWeb
+```
+
+macOS:
+
+```bash
+python -m PyInstaller --noconfirm --clean --name MarkItDownWeb --onefile --console \
+  --paths packages/markitdown-web/src \
+  --paths packages/markitdown/src \
+  --collect-all markitdown \
+  --collect-all magika \
+  --collect-all pdfplumber \
+  --collect-all pypdfium2 \
+  --collect-all openpyxl \
+  --collect-all pptx \
+  --collect-all mammoth \
+  --add-data "packages/markitdown-web/src/markitdown_web/static:markitdown_web/static" \
+  packages/markitdown-web/scripts/markitdown_web_launcher.py
+```
+
+The executable is written to:
+
+```text
+dist/MarkItDownWeb
+```
+
+Run the packaged app:
+
+```bash
+./dist/MarkItDownWeb --port 3000 --password change-me
+```
+
+On Windows:
+
+```powershell
+.\dist\MarkItDownWeb.exe --port 3000 --password change-me
+```
+
+The launcher starts the web server and opens the browser automatically unless `--no-browser` is supplied. Some conversion features rely on external tools such as `ffmpeg` or `exiftool`; install them on the target machine and make sure they are available on `PATH` when you need audio metadata/transcription or EXIF metadata support.
+
 ### Docker
 
 ```sh
 docker build -t markitdown:latest .
 docker run --rm -i markitdown:latest < ~/your-file.pdf > output.md
 ```
+
+To build and run the web app Docker image:
+
+```bash
+docker build -f packages/markitdown-web/Dockerfile -t markitdown-web:latest .
+docker run --rm -p 3000:3000 -e MARKITDOWN_WEB_PASSWORD=change-me markitdown-web:latest
+```
+
+Open `http://127.0.0.1:3000`.
 
 ## Contributing
 
